@@ -1,0 +1,71 @@
+﻿Sub Moderate()
+'Define Variables
+
+Dim ws As Worksheet
+Dim wb As Workbook
+Dim sum_tab As Double
+sum_tab = 2
+Dim ticker As String
+Dim yr_begin As Double
+Dim yr_end As Double
+Dim change As Double
+Dim percent_change As Double
+Dim ticker_total As Double
+ticker_total = 0
+
+'Prevent Overflow
+On Error Resume Next
+    
+    For Each ws In ThisWorkbook.Worksheets
+'Loop through all sheets
+        
+    'Create column headers
+    ws.Cells(1, 9).Value = "Ticker"
+    ws.Cells(1, 10).Value = "Yearly Change"
+    ws.Cells(1, 11).Value = "% Change"
+    ws.Cells(1, 12).Value = "Total Volume"
+    
+        For i = 2 To ws.UsedRange.Rows.Count
+        ' Check the ticker
+            If ws.Cells(i + 1, 1).Value <> ws.Cells(i, 1).Value Then
+            ' Set the Ticker
+            ticker = ws.Cells(i, 1).Value
+            ' Add to the Ticker Total
+            ticker_total = ticker_total + ws.Cells(i, 7).Value
+            ' Write the Ticker Symbol in the Summary Table
+            ws.Cells(sum_tab, [9]).Value = ticker
+            ' Write the Ticker Total to the Summary Table
+            ws.Cells(sum_tab, [12]).Value = ticker_total
+            'define yearly change
+            yr_begin = ws.Cells(i, 3).Value
+            yr_end = ws.Cells(i, 6).Value
+            'calculate change
+            change = (yr_end - yr_begin)
+            'Write the yearly change in the Summary Table
+            ws.Cells(sum_tab, [10]).Value = change
+            'calculate percent change
+            percent_change = ((yr_end - yr_begin) / yr_begin) * 100
+            'Write percent change in the Summary Table
+            ws.Cells(sum_tab, [11]).Value = percent_change
+            ' Add one to the summary table row
+            sum_tab = sum_tab + 1
+            ' Reset the Totals
+            ticker_total = 0
+            ' If the cell immediately following a row is the same ticker...
+            Else
+            ' Add to the Totals
+            ticker_total = ticker_total + ws.Cells(i, 7).Value
+            End If
+
+           'highlight positive change in green
+           If percent_change > 0 Then
+           ws.Cells(i, 11).Interior.ColorIndex = 4
+       
+           'highlight negative change in red
+           Else
+           ws.Cells(i, 11).Interior.ColorIndex = 3
+           End If
+        Next i
+    
+    Next ws
+End Sub

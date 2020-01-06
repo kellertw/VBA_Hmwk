@@ -1,0 +1,49 @@
+Sub easy()
+
+'Define Variables
+
+Dim ws As Worksheet
+Dim wb As Workbook
+Dim sum_tab As Double
+sum_tab = 2
+Dim ticker As String
+Dim yr_begin As Integer
+Dim yr_end As Integer
+Dim change As Integer
+Dim percent_change As Integer
+Dim ticker_total As Double
+ticker_total = 0
+
+On Error Resume Next
+    
+    For Each ws In ThisWorkbook.Worksheets
+'Loop through all sheets
+        
+    'Create column headers
+    ws.Cells(1, 9).Value = "Ticker"
+    ws.Cells(1, 10).Value = "Total Volume"
+        
+        For i = 2 To ws.UsedRange.Rows.Count
+        ' Check the ticker
+            If ws.Cells(i + 1, 1).Value <> ws.Cells(i, 1).Value Then
+            ' Set the Ticker
+            ticker = ws.Cells(i, 1).Value
+            ' Add to the Ticker Total
+            ticker_total = ticker_total + ws.Cells(i, 7).Value
+            ' Write the Ticker Symbol in the Summary Table
+            ws.Cells(sum_tab, [9]).Value = ticker
+            ' Write the Ticker Total to the Summary Table
+            ws.Cells(sum_tab, [10]).Value = ticker_total
+            ' Add one to the summary table row
+            sum_tab = sum_tab + 1
+            ' Reset the Ticker Total
+            ticker_total = 0
+            ' If the cell immediately following a row is the same ticker...
+            Else
+            ' Add to the Ticker Total
+            ticker_total = ticker_total + ws.Cells(i, 7).Value
+            End If
+        Next i
+    
+    Next ws
+End Sub
